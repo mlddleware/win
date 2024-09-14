@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import psycopg2
 import os
 
 app = Flask(__name__)
+CORS(app)  # Разрешаем все запросы с любого источника
 
 # Получаем порт и параметры подключения из переменных окружения
 port = int(os.environ.get("PORT", 5000))
