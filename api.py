@@ -50,6 +50,34 @@ def postback():
 
     return jsonify({"status": "error", "message": "user_id is required"}), 400
 
+@app.route('/check_id', methods=['POST'])
+def check_id():
+    # Получаем ID из запроса
+    id_to_check = request.json.get('id')
+    
+    if not id_to_check:
+        return jsonify({"status": "error", "message": "ID is required"}), 400
+    
+    # Подключаемся к базе данных
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Проверяем, существует ли ID в столбцах user_id и partner_id
+    cursor.execute("""
+        SELECT 1 FROM users 
+        WHERE user_id = %s OR partner_id = %s
+    """, (id_to_check, id_to_check))
+    
+    exists = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+    
+    if exists:
+        return jsonify({"status": "success", "message": "ID exists"}), 200
+    else:
+        return jsonify({"status": "error", "message": "ID does not exist"}), 404
+
 if __name__ == "__main__":
     # Запуск приложения Flask
     app.run(host='0.0.0.0', port=port)
