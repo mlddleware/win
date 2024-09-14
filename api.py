@@ -21,7 +21,7 @@ def postback():
         # Подключаемся к базе данных и выполняем обновление
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("UPDATE users SET partnerid = %s WHERE user_id = %s", (user_id, user_id))
+        cursor.execute("UPDATE users SET partner_id = %s WHERE user_id = %s", (user_id, user_id))
         conn.commit()
         cursor.close()
         conn.close()
