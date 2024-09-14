@@ -13,10 +13,11 @@ def get_db():
     conn = psycopg2.connect(db_url)
     return conn
 
-@app.route('/postback', methods=['POST'])
+@app.route('/postback', methods=['GET', 'POST'])
 def postback():
     # Получаем параметр user_id из запроса
-    user_id = request.form.get('user_id')
+    user_id = request.args.get('user_id') if request.method == 'GET' else request.form.get('user_id')
+    
     if user_id:
         # Подключаемся к базе данных
         conn = get_db()
