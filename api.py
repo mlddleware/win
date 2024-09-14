@@ -18,14 +18,30 @@ def postback():
     # Получаем параметр user_id из запроса
     user_id = request.form.get('user_id')
     if user_id:
-        # Подключаемся к базе данных и выполняем обновление
+        # Подключаемся к базе данных
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("UPDATE users SET partner_id = %s WHERE user_id = %s", (user_id, user_id))
+
+        # Проверяем, существует ли запись с указанным user_id
+        cursor.execute("SELECT 1 FROM users WHERE user_id = %s", (user_id,))
+        exists = cursor.fetchone()
+
+        if exists:
+            # Если запись существует, обновляем только partner_id
+            cursor.execute("UPDATE users SET partner_id = %s WHERE user_id = %s", (user_id, user_id))
+        else:
+            # Если записи не существует, создаем новую с user_id и partner_id
+            cursor.execute("INSERT INTO users (user_id, partner_id) VALUES (%s, %s)", (user_id, user_id))
+        
+        # Сохраняем изменения в базе данных
         conn.commit()
+
+        # Закрываем соединение
         cursor.close()
         conn.close()
+
         return jsonify({"status": "success"}), 200
+
     return jsonify({"status": "error", "message": "user_id is required"}), 400
 
 if __name__ == "__main__":
