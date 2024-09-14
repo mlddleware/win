@@ -80,6 +80,34 @@ def check_id():
     else:
         return jsonify({"status": "error", "message": "ID does not exist"}), 404
 
+@app.route('/check_balance', methods=['GET', 'POST'])
+def check_balance():
+    # Получаем ID из запроса
+    user_id = request.json.get('id')
+    
+    if not user_id:
+        return jsonify({"status": "error", "message": "ID is required"}), 400
+    
+    # Подключаемся к базе данных
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Проверяем значение столбца amount для указанного user_id
+    cursor.execute("SELECT amount FROM users WHERE user_id = %s", (user_id,))
+    result = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+    
+    if result:
+        amount = result[0]
+        if amount <= 0:
+            return jsonify({"status": "insufficient_funds"}), 200
+        else:
+            return jsonify({"status": "success"}), 200
+    else:
+        return jsonify({"status": "error", "message": "ID does not exist"}), 404
+
 if __name__ == "__main__":
     # Запуск приложения Flask
     app.run(host='0.0.0.0', port=port)
