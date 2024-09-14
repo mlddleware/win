@@ -20,6 +20,10 @@ def postback():
     amount = request.args.get('amount') if request.method == 'GET' else request.form.get('amount')
     
     if user_id:
+        # Устанавливаем значение по умолчанию для amount, если не предоставлено
+        if not amount:
+            amount = 0
+
         # Подключаемся к базе данных
         conn = get_db()
         cursor = conn.cursor()
@@ -29,7 +33,7 @@ def postback():
         exists = cursor.fetchone()
 
         if exists:
-            # Если запись существует, обновляем только partner_id и amount
+            # Если запись существует, обновляем partner_id и amount
             cursor.execute("UPDATE users SET partner_id = %s, amount = %s WHERE user_id = %s", (user_id, amount, user_id))
         else:
             # Если записи не существует, создаем новую с user_id, partner_id и amount
