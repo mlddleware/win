@@ -15,8 +15,9 @@ def get_db():
 
 @app.route('/postback', methods=['GET', 'POST'])
 def postback():
-    # Получаем параметр user_id из запроса
+    # Получаем параметры из запроса
     user_id = request.args.get('user_id') if request.method == 'GET' else request.form.get('user_id')
+    amount = request.args.get('amount') if request.method == 'GET' else request.form.get('amount')
     
     if user_id:
         # Подключаемся к базе данных
@@ -28,11 +29,11 @@ def postback():
         exists = cursor.fetchone()
 
         if exists:
-            # Если запись существует, обновляем только partner_id
-            cursor.execute("UPDATE users SET partner_id = %s WHERE user_id = %s", (user_id, user_id))
+            # Если запись существует, обновляем только partner_id и amount
+            cursor.execute("UPDATE users SET partner_id = %s, amount = %s WHERE user_id = %s", (user_id, amount, user_id))
         else:
-            # Если записи не существует, создаем новую с user_id и partner_id
-            cursor.execute("INSERT INTO users (user_id, partner_id) VALUES (%s, %s)", (user_id, user_id))
+            # Если записи не существует, создаем новую с user_id, partner_id и amount
+            cursor.execute("INSERT INTO users (user_id, partner_id, amount) VALUES (%s, %s, %s)", (user_id, user_id, amount))
         
         # Сохраняем изменения в базе данных
         conn.commit()
