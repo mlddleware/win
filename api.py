@@ -50,7 +50,7 @@ def postback():
 
     return jsonify({"status": "error", "message": "user_id is required"}), 400
 
-@app.route('/check_id', methods=['POST'])
+@app.route('/check_id', methods=['GET', 'POST'])
 def check_id():
     # Получаем ID из запроса
     id_to_check = request.json.get('id')
